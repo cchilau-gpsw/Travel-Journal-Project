@@ -67,7 +67,7 @@ public class TravelDestinationsFragment extends Fragment {
         destinations.add(new Destination("Holiday 2017", "Islands", "https://upload.wikimedia.org/wikipedia/commons/5/58/Fernando_noronha.jpg"));
         destinations.add(new Destination("Fall 2017", "Rome", "https://cdn.fodors.com/wp-content/uploads/2018/10/2_UltimateRome_TheColosseum.jpg"));
         destinations.add(new Destination("Summer 2017", "London", "https://london.ac.uk/sites/default/files/styles/promo_large/public/2018-10/london-aerial-cityscape-river-thames_1.jpg?itok=BMaDUhjp"));
-        destinations.add(new Destination("Winter 2017", "Paris", "http://www.groupe-rondy.com/wp-content/uploads/2017/11/Rondy-nuit-du-bricolage-unibal.jpg"));
+        destinations.add(new Destination("Winter 2017", "Paris", "https://www.triumemba.org/content/uploads/2018/09/pexels-photo-338515.jpg"));
         destinations.add(new Destination("Spring 2018", "San Francisco", "https://cdn.britannica.com/s:700x450/85/155085-004-E7605258.jpg"));
         destinations.add(new Destination("Summer 2018", "Bucharest", "https://cdn.tourradar.com/s3/tour/750x400/99500_630b34a9.jpg"));
         return destinations;
