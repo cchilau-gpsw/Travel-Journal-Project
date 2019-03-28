@@ -4,24 +4,38 @@ package com.example.traveljournalproject;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class TravelDestinationsFragment extends Fragment {
-
     public static final String TRIP_NAME = "trip name";
     public static final String DESTINATION = "destination";
+    private static final String DESTINATIONS_COLLECTION = "destinations";
 
     public RecyclerView getRecyclerViewDestinations() {
         return mRecyclerViewDestinations;
@@ -29,11 +43,7 @@ public class TravelDestinationsFragment extends Fragment {
 
     private RecyclerView mRecyclerViewDestinations;
 
-
-    public TravelDestinationsFragment() {
-        // Required empty public constructor
-    }
-
+    public TravelDestinationsFragment() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,40 +58,47 @@ public class TravelDestinationsFragment extends Fragment {
         mRecyclerViewDestinations = view.findViewById(R.id.recycler_view_destinations);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerViewDestinations.setLayoutManager(layoutManager);
-        DestinationAdapter destinationAdapter = new DestinationAdapter(getDestinations(), getActivity());
-        mRecyclerViewDestinations.setAdapter(destinationAdapter);
 
-        mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Intent intent = new Intent(getActivity(), ManageTrip.class);
-                intent.putExtra(TRIP_NAME, getDestinations().get(position).getSeason());
-                intent.putExtra(DESTINATION, getDestinations().get(position).getDestination());
-                startActivity(intent);
-            }
-        }));
+
+        final List<Destination> destinations = new ArrayList<>();
+        FirebaseFirestore.getInstance().collection(DESTINATIONS_COLLECTION)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                destinations.add(new Destination(document.getString("season"), document.getString("location"), document.getString("imageLocation")));
+
+                                DestinationAdapter destinationAdapter = new DestinationAdapter(destinations, getActivity());
+                                mRecyclerViewDestinations.setAdapter(destinationAdapter);
+                                mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(View view, int position) {
+                                        Intent intent = new Intent(getActivity(), ManageTrip.class);
+                                        intent.putExtra(TRIP_NAME, destinations.get(position).getSeason());
+                                        intent.putExtra(DESTINATION, destinations.get(position).getDestination());
+                                        startActivity(intent);
+                                    }
+                                }));
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), "Error getting data from database", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
     }
 
-    private List<Destination> getDestinations() {
-        List<Destination> destinations = new ArrayList<>();
-        destinations.add(new Destination("Holiday 2017", "Islands", "https://upload.wikimedia.org/wikipedia/commons/5/58/Fernando_noronha.jpg"));
-        destinations.add(new Destination("Fall 2017", "Rome", "https://cdn.fodors.com/wp-content/uploads/2018/10/2_UltimateRome_TheColosseum.jpg"));
-        destinations.add(new Destination("Summer 2017", "London", "https://london.ac.uk/sites/default/files/styles/promo_large/public/2018-10/london-aerial-cityscape-river-thames_1.jpg?itok=BMaDUhjp"));
-        destinations.add(new Destination("Winter 2017", "Paris", "https://www.triumemba.org/content/uploads/2018/09/pexels-photo-338515.jpg"));
-        destinations.add(new Destination("Spring 2018", "San Francisco", "https://cdn.britannica.com/s:700x450/85/155085-004-E7605258.jpg"));
-        destinations.add(new Destination("Summer 2018", "Bucharest", "https://cdn.tourradar.com/s3/tour/750x400/99500_630b34a9.jpg"));
-        return destinations;
-    }
 
     public void addNewDestinationOnClick(View view) {
         Intent intent = new Intent(getActivity(), ManageTrip.class);
         startActivity(intent);
     }
 
-    public void addDestination(String season, String location, String imageLocation) {
-        List<Destination> currentDestinationList = getDestinations();
-        currentDestinationList.add(new Destination(season, location, imageLocation));
-    }
+//    public void addDestination(String season, String location, String imageLocation) {
+//        List<Destination> currentDestinationList = getDestinations();
+//        currentDestinationList.add(new Destination(season, location, imageLocation));
+//    }
 
 
     public void onClick(View view) {
@@ -96,5 +113,7 @@ public class TravelDestinationsFragment extends Fragment {
             }
         }));
     }
+
+
 
 }

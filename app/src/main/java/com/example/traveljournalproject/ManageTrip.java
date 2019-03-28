@@ -84,4 +84,10 @@ public class ManageTrip extends AppCompatActivity {
         DialogFragment newFragment = new CustomDatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "DatePicker");
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(ManageTrip.this, MyTrips.class);
+        startActivity(intent);
+    }
 }
