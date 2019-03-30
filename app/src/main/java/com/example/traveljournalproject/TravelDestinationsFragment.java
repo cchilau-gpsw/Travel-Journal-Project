@@ -26,9 +26,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
-
-
 /**
  * A simple {@link Fragment} subclass.
  */
