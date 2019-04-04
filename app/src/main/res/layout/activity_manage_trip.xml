@@ -125,6 +125,7 @@
         android:layout_marginTop="@dimen/dp8"
         android:layout_marginEnd="@dimen/dp16"
         android:layout_marginRight="@dimen/dp16"
+        android:max="5000"
         android:progress="12"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

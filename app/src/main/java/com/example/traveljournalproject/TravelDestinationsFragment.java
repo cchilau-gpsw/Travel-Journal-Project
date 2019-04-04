@@ -1,24 +1,19 @@
 package com.example.traveljournalproject;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -34,6 +29,7 @@ public class TravelDestinationsFragment extends Fragment {
     public static final String DESTINATION = "destination";
     public static final String TRIP_TYPE = "trip type";
     public static final String RATING = "rating";
+    public static final String PRICE = "price";
     private static final String DESTINATIONS_COLLECTION = "destinations";
 
     public RecyclerView getRecyclerViewDestinations() {
@@ -68,7 +64,7 @@ public class TravelDestinationsFragment extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 destinations.add(new Destination(document.getString("season"), document.getString("location"), document.getString("imageLocation"),
-                                        document.getString("tripType"), (float)(document.getLong("rating"))));
+                                        document.getString("tripType"), (float)(document.getLong("rating")), document.getLong("price").intValue()));
 
                                 DestinationAdapter destinationAdapter = new DestinationAdapter(destinations, getActivity());
                                 mRecyclerViewDestinations.setAdapter(destinationAdapter);
@@ -85,6 +81,7 @@ public class TravelDestinationsFragment extends Fragment {
                                         intent.putExtra(DESTINATION, destinations.get(position).getDestination());
                                         intent.putExtra(TRIP_TYPE, destinations.get(position).getTripType());
                                         intent.putExtra(RATING, destinations.get(position).getRating());
+                                        intent.putExtra(PRICE, destinations.get(position).getPrice());
                                         startActivity(intent);
                                     }
                                 }));

@@ -1,31 +1,20 @@
 package com.example.traveljournalproject;
 
-import android.support.annotation.NonNull;
-import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
 public class Destination {
     private String mSeason;
     private String mDestination;
     private String mImageLocation;
     private String mTripType;
     private float mRating;
+    private int mPrice;
 
-    public Destination(String season, String destination, String imageLocation, String tripType, float rating) {
+    public Destination(String season, String destination, String imageLocation, String tripType, float rating, int price) {
         mSeason = season;
         mDestination = destination;
         mImageLocation = imageLocation;
         mTripType = tripType;
         mRating = rating;
+        mPrice = price;
     }
 
     public String getSeason() {
@@ -66,5 +55,13 @@ public class Destination {
 
     public void setRating(float rating) {
         mRating = rating;
+    }
+
+    public int getPrice() {
+        return mPrice;
+    }
+
+    public void setPrice(int price) {
+        mPrice = price;
     }
 }

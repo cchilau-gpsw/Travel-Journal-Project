@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RatingBar;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,6 +43,7 @@ public class ManageTrip extends AppCompatActivity {
     private RadioButton mRadioButtonSeaSide;
     private RadioButton mRadioButtonMountains;
     private RatingBar mRatingBarEvaluation;
+    private SeekBar mSeekBarPrice;
     private String mImageUrl;
 
 
@@ -75,6 +77,8 @@ public class ManageTrip extends AppCompatActivity {
                 }
                 float rating = bundle.getFloat(TravelDestinationsFragment.RATING);
                 mRatingBarEvaluation.setRating(rating);
+                int price = bundle.getInt(TravelDestinationsFragment.PRICE);
+                mSeekBarPrice.setProgress(price);
             }
         }
     }
@@ -86,6 +90,7 @@ public class ManageTrip extends AppCompatActivity {
         mRadioButtonMountains = findViewById(R.id.radio_button_mountains);
         mRadioButtonSeaSide = findViewById(R.id.radio_button_sea_side);
         mRatingBarEvaluation = findViewById(R.id.rating_bar);
+        mSeekBarPrice = findViewById(R.id.seek_bar_price);
     }
 
     public void selectPhotoFromGallery(View view) {

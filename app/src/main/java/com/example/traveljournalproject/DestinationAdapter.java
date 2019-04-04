@@ -32,7 +32,8 @@ public class DestinationAdapter extends RecyclerView.Adapter<DestinationViewHold
     public void onBindViewHolder(@NonNull DestinationViewHolder destinationViewHolder, int i) {
         Destination currentDestination = mDestinations.get(i);
         destinationViewHolder.getTextViewSeason().setText(currentDestination.getSeason());
-        destinationViewHolder.getTextViewDestination().setText((currentDestination.getDestination()));
+        destinationViewHolder.getTextViewDestination().setText(currentDestination.getDestination());
+        destinationViewHolder.getTextViewPriceAndRating().setText(currentDestination.getPrice() + " / " + currentDestination.getRating());
         Picasso.get().load(currentDestination.getImageLocation()).fit()
                 .placeholder(R.drawable.android_3)
                 .error(R.drawable.android_3)

@@ -11,6 +11,7 @@ public class DestinationViewHolder extends RecyclerView.ViewHolder {
     private ImageView mImageViewDestination;
     private TextView mTextViewSeason;
     private TextView mTextViewDestination;
+    private TextView mTextViewPriceAndRating;
 
 
     public DestinationViewHolder(@NonNull View itemView) {
@@ -19,6 +20,7 @@ public class DestinationViewHolder extends RecyclerView.ViewHolder {
         mImageViewDestination = itemView.findViewById(R.id.image_view_destination);
         mTextViewSeason = itemView.findViewById(R.id.text_view_season);
         mTextViewDestination = itemView.findViewById(R.id.text_view_destination);
+        mTextViewPriceAndRating = itemView.findViewById(R.id.text_view_price_rating);
     }
 
     public ImageView getImageViewDestination() {
@@ -43,5 +45,13 @@ public class DestinationViewHolder extends RecyclerView.ViewHolder {
 
     public void setTextViewDestination(TextView textViewDestination) {
         mTextViewDestination = textViewDestination;
+    }
+
+    public TextView getTextViewPriceAndRating() {
+        return mTextViewPriceAndRating;
+    }
+
+    public void setTextViewPriceAndRating(TextView textViewPriceAndRating) {
+        mTextViewPriceAndRating = textViewPriceAndRating;
     }
 }
