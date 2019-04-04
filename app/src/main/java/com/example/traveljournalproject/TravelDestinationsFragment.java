@@ -69,9 +69,23 @@ public class TravelDestinationsFragment extends Fragment {
 
                                 DestinationAdapter destinationAdapter = new DestinationAdapter(destinations, getActivity());
                                 mRecyclerViewDestinations.setAdapter(destinationAdapter);
-                                mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
+//                                mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
+//                                    @Override
+//                                    public void onItemClick(View view, int position) {
+//                                        Intent intent = new Intent(getActivity(), ManageTrip.class);
+//                                        intent.putExtra(TRIP_NAME, destinations.get(position).getSeason());
+//                                        intent.putExtra(DESTINATION, destinations.get(position).getDestination());
+//                                        startActivity(intent);
+//                                    }
+//                                }));
+                                mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecyclerViewDestinations, new ClickListener() {
                                     @Override
-                                    public void onItemClick(View view, int position) {
+                                    public void onClick(View view, int position) {
+
+                                    }
+
+                                    @Override
+                                    public void onLongClick(View view, int position) {
                                         Intent intent = new Intent(getActivity(), ManageTrip.class);
                                         intent.putExtra(TRIP_NAME, destinations.get(position).getSeason());
                                         intent.putExtra(DESTINATION, destinations.get(position).getDestination());

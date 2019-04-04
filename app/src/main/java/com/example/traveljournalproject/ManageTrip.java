@@ -5,15 +5,30 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.api.Logging;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ManageTrip extends AppCompatActivity {
 
@@ -21,6 +36,7 @@ public class ManageTrip extends AppCompatActivity {
     public static final int CAMERA_REQUEST_CODE = 2;
     private EditText mEditTextTripName;
     private EditText mEditTextDestination;
+    private String mImageUrl;
 
 
     @Override
@@ -66,11 +82,26 @@ public class ManageTrip extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
             if (requestCode == GALLERY_REQUEST_CODE) {
                 Uri selectedImageUri = data.getData();
-                final String path = selectedImageUri.getPath();
-                File file = new File(path);
-                final String filePath = file.getAbsolutePath();
+
+                storageReference.putFile(selectedImageUri)
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                               String downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+                               Log.d("URL::::::::: ", downloadUrl);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(ManageTrip.this, "Failed to upload file", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+
             }
         }
     }
@@ -89,5 +120,29 @@ public class ManageTrip extends AppCompatActivity {
     public void onBackPressed() {
         Intent intent = new Intent(ManageTrip.this, MyTrips.class);
         startActivity(intent);
+    }
+
+    public void saveDestinationOnClick(View view) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> destination = new HashMap<>();
+        destination.put("season", mEditTextTripName.getText().toString());
+        destination.put("location", mEditTextDestination.getText().toString());
+        destination.put("imageLocation", "https://static.toiimg.com/photo/msid-58515713,width-96,height-65.cms");
+
+        db.collection("destinations")
+                .add(destination)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(ManageTrip.this, "DocumentSnapshot added with ID: " + documentReference.getId(), Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ManageTrip.this, "Error adding document", Toast.LENGTH_LONG).show();
+                    }
+                });
+
     }
 }

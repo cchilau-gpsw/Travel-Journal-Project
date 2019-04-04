@@ -7,7 +7,7 @@
     tools:context=".ManageTrip">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/text_view_header_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dp16"
@@ -32,7 +32,7 @@
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/text_view_header_email" />
 
     <TextView
         android:id="@+id/text_view_destination"
@@ -264,6 +264,7 @@
         android:textSize="@dimen/sp24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:onClick="saveDestinationOnClick"
         app:layout_constraintTop_toBottomOf="@+id/button_select_photo" />
 
 </android.support.constraint.ConstraintLayout>

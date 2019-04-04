@@ -16,15 +16,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +41,9 @@ public class MyTrips extends AppCompatActivity
 
     public static final String TRIP_NAME = "trip name";
     public static final String DESTINATION = "destination";
+
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +70,8 @@ public class MyTrips extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-//        Destination.getDestinationsFromDatabase();
+        initFirebase();
+
         addFragment(new TravelDestinationsFragment());
     }
 
@@ -78,6 +89,16 @@ public class MyTrips extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.my_trips, menu);
+        TextView userNameHeader = findViewById(R.id.text_view_header_username);
+        TextView emailHeader = findViewById(R.id.text_view_header_email);
+        String loggedInUser = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        if (loggedInUser != null && !loggedInUser.isEmpty()) {
+            userNameHeader.setText(loggedInUser);
+        }
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        if (userEmail != null && !userEmail.isEmpty()) {
+            emailHeader.setText(userEmail);
+        }
         return true;
     }
 
@@ -90,6 +111,10 @@ public class MyTrips extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            FirebaseAuth.getInstance().signOut();
+            finish();
+            startActivity(new Intent(this, SignInActivity.class));
+
             return true;
         }
 
@@ -127,4 +152,23 @@ public class MyTrips extends AppCompatActivity
                 .replace(R.id.frame_layout_container, fragment)
                 .commit();
     }
-}
+
+    private void initFirebase() {
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        if (mFirebaseUser == null) {
+            startActivity(new Intent(this, SignInActivity.class));
+            finish();
+            return;
+        } else {
+//            String username = mFirebaseUser.getDisplayName().toString();
+//            if (username != null && !username.isEmpty()) {
+//                TextView cucu = findViewById(R.id.text_view_header_username);
+//                cucu.setText("cucu");
+//            }
+//            String userEmail = mFirebaseUser.getEmail().toString();
+//            if (userEmail != null && !userEmail.isEmpty()) {
+////                mTextViewUserEmail.setText(userEmail);
+            }
+        }
+    }

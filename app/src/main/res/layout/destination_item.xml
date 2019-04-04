@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="@dimen/dp8">
+        android:layout_margin="@dimen/dp16">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -24,16 +24,12 @@
                 android:id="@+id/image_view_destination"
                 android:layout_width="@dimen/dp0"
                 android:layout_height="@dimen/dp0"
-                android:layout_marginStart="@dimen/dp16"
-                android:layout_marginLeft="@dimen/dp16"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
                 android:scaleType="fitXY"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="w,1:1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.25"
+                app:layout_constraintWidth_percent="0.4"
                 app:srcCompat="@android:drawable/btn_star_big_on" />
 
             <TextView
@@ -60,6 +56,29 @@
                 android:text="TextView"
                 app:layout_constraintStart_toEndOf="@+id/image_view_destination"
                 app:layout_constraintTop_toBottomOf="@+id/text_view_season" />
+
+            <TextView
+                android:id="@+id/text_view_price_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="8dp"
+                android:text="0.0/0.0"
+                app:layout_constraintStart_toEndOf="@+id/image_view_destination"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_destination" />
+
+            <CheckBox
+                android:id="@+id/check_box_bookmark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:button="@drawable/favorite"
+                android:checked="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
 
         </android.support.constraint.ConstraintLayout>
