@@ -32,6 +32,8 @@ import java.util.List;
 public class TravelDestinationsFragment extends Fragment {
     public static final String TRIP_NAME = "trip name";
     public static final String DESTINATION = "destination";
+    public static final String TRIP_TYPE = "trip type";
+    public static final String RATING = "rating";
     private static final String DESTINATIONS_COLLECTION = "destinations";
 
     public RecyclerView getRecyclerViewDestinations() {
@@ -65,19 +67,11 @@ public class TravelDestinationsFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                destinations.add(new Destination(document.getString("season"), document.getString("location"), document.getString("imageLocation")));
+                                destinations.add(new Destination(document.getString("season"), document.getString("location"), document.getString("imageLocation"),
+                                        document.getString("tripType"), (float)(document.getLong("rating"))));
 
                                 DestinationAdapter destinationAdapter = new DestinationAdapter(destinations, getActivity());
                                 mRecyclerViewDestinations.setAdapter(destinationAdapter);
-//                                mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-//                                    @Override
-//                                    public void onItemClick(View view, int position) {
-//                                        Intent intent = new Intent(getActivity(), ManageTrip.class);
-//                                        intent.putExtra(TRIP_NAME, destinations.get(position).getSeason());
-//                                        intent.putExtra(DESTINATION, destinations.get(position).getDestination());
-//                                        startActivity(intent);
-//                                    }
-//                                }));
                                 mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecyclerViewDestinations, new ClickListener() {
                                     @Override
                                     public void onClick(View view, int position) {
@@ -89,6 +83,8 @@ public class TravelDestinationsFragment extends Fragment {
                                         Intent intent = new Intent(getActivity(), ManageTrip.class);
                                         intent.putExtra(TRIP_NAME, destinations.get(position).getSeason());
                                         intent.putExtra(DESTINATION, destinations.get(position).getDestination());
+                                        intent.putExtra(TRIP_TYPE, destinations.get(position).getTripType());
+                                        intent.putExtra(RATING, destinations.get(position).getRating());
                                         startActivity(intent);
                                     }
                                 }));

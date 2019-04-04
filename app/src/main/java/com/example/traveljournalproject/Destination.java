@@ -17,12 +17,15 @@ public class Destination {
     private String mSeason;
     private String mDestination;
     private String mImageLocation;
+    private String mTripType;
+    private float mRating;
 
-
-    public Destination(String season, String destination, String imageLocation) {
+    public Destination(String season, String destination, String imageLocation, String tripType, float rating) {
         mSeason = season;
         mDestination = destination;
         mImageLocation = imageLocation;
+        mTripType = tripType;
+        mRating = rating;
     }
 
     public String getSeason() {
@@ -47,5 +50,21 @@ public class Destination {
 
     public void setImageLocation(String imageLocation) {
         mImageLocation = imageLocation;
+    }
+
+    public String getTripType() {
+        return mTripType;
+    }
+
+    public void setTripType(String tripType) {
+        mTripType = tripType;
+    }
+
+    public float getRating() {
+        return mRating;
+    }
+
+    public void setRating(float rating) {
+        mRating = rating;
     }
 }

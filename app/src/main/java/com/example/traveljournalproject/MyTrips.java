@@ -39,9 +39,6 @@ import java.util.List;
 public class MyTrips extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static final String TRIP_NAME = "trip name";
-    public static final String DESTINATION = "destination";
-
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 

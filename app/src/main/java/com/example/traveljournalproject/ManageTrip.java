@@ -14,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -36,6 +38,10 @@ public class ManageTrip extends AppCompatActivity {
     public static final int CAMERA_REQUEST_CODE = 2;
     private EditText mEditTextTripName;
     private EditText mEditTextDestination;
+    private RadioButton mRadioButtonCityBreak;
+    private RadioButton mRadioButtonSeaSide;
+    private RadioButton mRadioButtonMountains;
+    private RatingBar mRatingBarEvaluation;
     private String mImageUrl;
 
 
@@ -49,10 +55,26 @@ public class ManageTrip extends AppCompatActivity {
         if (getIntent() != null) {
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) {
-                String tripName = bundle.getString(MyTrips.TRIP_NAME);
+                String tripName = bundle.getString(TravelDestinationsFragment.TRIP_NAME);
                 mEditTextTripName.setText(tripName);
-                String destination = bundle.getString(MyTrips.DESTINATION);
+                String destination = bundle.getString(TravelDestinationsFragment.DESTINATION);
                 mEditTextDestination.setText(destination);
+                String tripType = bundle.getString(TravelDestinationsFragment.TRIP_TYPE);
+                if (tripType != null && !tripType.isEmpty()) {
+                    switch (tripType) {
+                        case "Sea Side":
+                            mRadioButtonSeaSide.toggle();
+                            break;
+                        case "Mountains":
+                            mRadioButtonMountains.toggle();
+                            break;
+                        case "City Break":
+                            mRadioButtonCityBreak.toggle();
+                            break;
+                    }
+                }
+                float rating = bundle.getFloat(TravelDestinationsFragment.RATING);
+                mRatingBarEvaluation.setRating(rating);
             }
         }
     }
@@ -60,6 +82,10 @@ public class ManageTrip extends AppCompatActivity {
     private void initView() {
         mEditTextTripName = findViewById(R.id.edit_text_trip_name);
         mEditTextDestination = findViewById(R.id.edit_text_destination);
+        mRadioButtonCityBreak = findViewById(R.id.radio_button_city_break);
+        mRadioButtonMountains = findViewById(R.id.radio_button_mountains);
+        mRadioButtonSeaSide = findViewById(R.id.radio_button_sea_side);
+        mRatingBarEvaluation = findViewById(R.id.rating_bar);
     }
 
     public void selectPhotoFromGallery(View view) {
