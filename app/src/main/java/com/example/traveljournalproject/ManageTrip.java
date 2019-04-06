@@ -1,15 +1,12 @@
 package com.example.traveljournalproject;
 
 import android.Manifest;
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -17,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RatingBar;
@@ -26,22 +22,16 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.api.Logging;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ManageTrip extends AppCompatActivity {
+public class ManageTrip extends AppCompatActivity implements DateChangedListener {
 
     public static final int GALLERY_REQUEST_CODE = 1;
     public static final int CAMERA_REQUEST_CODE = 2;
@@ -164,18 +154,12 @@ public class ManageTrip extends AppCompatActivity {
     }
 
     public void selectStartDateOnClick(View view) {
-        DialogFragment newFragment = new CustomDatePickerFragment();
+        DialogFragment newFragment = new CustomStartDatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "DatePicker");
-
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            String dateString = bundle.getString(START_DATE);
-            mButtonStartDate.setText(dateString);
-        }
     }
 
     public void selectEndDateOnClick(View view) {
-        DialogFragment newFragment = new CustomDatePickerFragment();
+        DialogFragment newFragment = new CustomEndDatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "DatePicker");
     }
 
@@ -209,5 +193,15 @@ public class ManageTrip extends AppCompatActivity {
                         Toast.makeText(ManageTrip.this, "Error adding document", Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    @Override
+    public void onStartDateChanged(int year, int month, int day) {
+        mButtonStartDate.setText(day + "/" + (month + 1) + "/" + year);
+    }
+
+    @Override
+    public void onEndDateChanged(int year, int month, int day) {
+        mButtonEndDate.setText(day + "/" + (month + 1) + "/" + year);
     }
 }

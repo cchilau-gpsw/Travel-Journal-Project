@@ -2,7 +2,6 @@ package com.example.traveljournalproject;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
@@ -10,7 +9,7 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-public class CustomDatePickerFragment extends DialogFragment {
+public class CustomEndDatePickerFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Calendar calendar = Calendar.getInstance();
@@ -27,11 +26,9 @@ public class CustomDatePickerFragment extends DialogFragment {
                     Toast.makeText(getActivity(), "The selected date is " + view.getYear() +
                             " / " + (view.getMonth() + 1) +
                             " / " + view.getDayOfMonth(), Toast.LENGTH_SHORT).show();
-                    Bundle bundle = new Bundle();
-                    bundle.putString(ManageTrip.START_DATE, view.getDayOfMonth() + "/" + (view.getMonth() + 1) + "/" + view.getYear());
-
-                    Intent intent = getActivity().getIntent();
-                    intent.putExtras(bundle);
+//
+                    DateChangedListener listener = (DateChangedListener)getActivity();
+                    listener.onEndDateChanged(year, month, day);
                 }
             };
 }
