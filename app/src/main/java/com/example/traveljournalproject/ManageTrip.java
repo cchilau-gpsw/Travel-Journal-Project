@@ -28,7 +28,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class ManageTrip extends AppCompatActivity implements DateChangedListener {
@@ -47,7 +52,10 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     private Button mButtonStartDate;
     private Button mButtonEndDate;
     private String mDatabaseDocumentID;
-    private String mImageLocation;
+    private static String mImageLocation;
+
+    private Date mStartDate;
+    private Date mEndDate;
 
 
     @Override
@@ -128,7 +136,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
+            final StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
             if (requestCode == GALLERY_REQUEST_CODE) {
                 Uri selectedImageUri = data.getData();
 
@@ -136,9 +144,15 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                               String downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
-                               Log.d("URL::::::::: ", downloadUrl);
-                               mImageLocation = downloadUrl;
+                                String downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
+                                Log.d("URL::::::::: ", downloadUrl);
+                                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        Log.d("**************", "onSuccess: uri= " + uri.toString());
+                                        mImageLocation = uri.toString();
+                                    }
+                                });
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -147,8 +161,6 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                                 Toast.makeText(ManageTrip.this, "Failed to upload file", Toast.LENGTH_LONG).show();
                             }
                         });
-
-
             }
         }
     }
@@ -176,7 +188,8 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
         destination.put("location", mEditTextDestination.getText().toString());
         destination.put("price", mSeekBarPrice.getProgress());
         destination.put("rating", mRatingBarEvaluation.getRating());
-//        destination.put("imageLocation", "https://static.toiimg.com/photo/msid-58515713,width-96,height-65.cms");
+        destination.put("startDate", mStartDate);
+        destination.put("endDate", mEndDate);
         destination.put("imageLocation", mImageLocation);
 
         db.collection("destinations")
@@ -198,10 +211,22 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     @Override
     public void onStartDateChanged(int year, int month, int day) {
         mButtonStartDate.setText(day + "/" + (month + 1) + "/" + year);
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            mStartDate = format.parse(day + "/" + (month + 1) + "/" + year);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onEndDateChanged(int year, int month, int day) {
         mButtonEndDate.setText(day + "/" + (month + 1) + "/" + year);
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            mEndDate = format.parse(day + "/" + (month + 1) + "/" + year);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }
