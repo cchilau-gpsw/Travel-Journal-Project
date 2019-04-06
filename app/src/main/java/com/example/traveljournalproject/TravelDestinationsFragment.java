@@ -18,6 +18,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,9 @@ public class TravelDestinationsFragment extends Fragment {
     public static final String TRIP_TYPE = "trip type";
     public static final String RATING = "rating";
     public static final String PRICE = "price";
+    public static final String START_DATE = "start date";
+    public static final String END_DATE = "end date";
+    public static final String DATABASE_DOCUMENT_ID = "document id";
     private static final String DESTINATIONS_COLLECTION = "destinations";
 
     public RecyclerView getRecyclerViewDestinations() {
@@ -64,9 +69,10 @@ public class TravelDestinationsFragment extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 destinations.add(new Destination(document.getString("season"), document.getString("location"), document.getString("imageLocation"),
-                                        document.getString("tripType"), (float)(document.getLong("rating")), document.getLong("price").intValue()));
+                                        document.getString("tripType"), (float)(document.getLong("rating")), document.getLong("price").intValue(),
+                                        document.getDate("startDate"), document.getDate("endDate"), document.getId()));
 
-                                DestinationAdapter destinationAdapter = new DestinationAdapter(destinations, getActivity());
+                                final DestinationAdapter destinationAdapter = new DestinationAdapter(destinations, getActivity());
                                 mRecyclerViewDestinations.setAdapter(destinationAdapter);
                                 mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecyclerViewDestinations, new ClickListener() {
                                     @Override
@@ -82,6 +88,10 @@ public class TravelDestinationsFragment extends Fragment {
                                         intent.putExtra(TRIP_TYPE, destinations.get(position).getTripType());
                                         intent.putExtra(RATING, destinations.get(position).getRating());
                                         intent.putExtra(PRICE, destinations.get(position).getPrice());
+                                        Format formatter = new SimpleDateFormat("dd/MM/yyyy");
+                                        intent.putExtra(START_DATE, formatter.format(destinations.get(position).getStartDate()));
+                                        intent.putExtra(END_DATE, formatter.format(destinations.get(position).getEndDate()));
+                                        intent.putExtra(DATABASE_DOCUMENT_ID, destinations.get(position).getDatabaseDocumentID());
                                         startActivity(intent);
                                     }
                                 }));

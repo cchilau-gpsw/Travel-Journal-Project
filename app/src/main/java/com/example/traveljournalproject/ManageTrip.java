@@ -1,18 +1,23 @@
 package com.example.traveljournalproject;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RatingBar;
@@ -30,6 +35,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +45,8 @@ public class ManageTrip extends AppCompatActivity {
 
     public static final int GALLERY_REQUEST_CODE = 1;
     public static final int CAMERA_REQUEST_CODE = 2;
+    public static final String START_DATE = "start date";
+    public static final String END_DATE = "end date";
     private EditText mEditTextTripName;
     private EditText mEditTextDestination;
     private RadioButton mRadioButtonCityBreak;
@@ -44,7 +54,10 @@ public class ManageTrip extends AppCompatActivity {
     private RadioButton mRadioButtonMountains;
     private RatingBar mRatingBarEvaluation;
     private SeekBar mSeekBarPrice;
-    private String mImageUrl;
+    private Button mButtonStartDate;
+    private Button mButtonEndDate;
+    private String mDatabaseDocumentID;
+    private String mImageLocation;
 
 
     @Override
@@ -79,6 +92,16 @@ public class ManageTrip extends AppCompatActivity {
                 mRatingBarEvaluation.setRating(rating);
                 int price = bundle.getInt(TravelDestinationsFragment.PRICE);
                 mSeekBarPrice.setProgress(price);
+                String startDate = bundle.getString(TravelDestinationsFragment.START_DATE);
+                if (startDate != null && !startDate.isEmpty()){
+                    mButtonStartDate.setText(startDate);
+                }
+                String endDate = bundle.getString(TravelDestinationsFragment.END_DATE);
+                if (endDate != null && !endDate.isEmpty()) {
+                    mButtonEndDate.setText(endDate);
+                }
+
+                mDatabaseDocumentID = bundle.getString(TravelDestinationsFragment.DATABASE_DOCUMENT_ID);
             }
         }
     }
@@ -91,6 +114,8 @@ public class ManageTrip extends AppCompatActivity {
         mRadioButtonSeaSide = findViewById(R.id.radio_button_sea_side);
         mRatingBarEvaluation = findViewById(R.id.rating_bar);
         mSeekBarPrice = findViewById(R.id.seek_bar_price);
+        mButtonStartDate = findViewById(R.id.button_start_date);
+        mButtonEndDate = findViewById(R.id.button_end_date);
     }
 
     public void selectPhotoFromGallery(View view) {
@@ -123,6 +148,7 @@ public class ManageTrip extends AppCompatActivity {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                String downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
                                Log.d("URL::::::::: ", downloadUrl);
+                               mImageLocation = downloadUrl;
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -140,6 +166,12 @@ public class ManageTrip extends AppCompatActivity {
     public void selectStartDateOnClick(View view) {
         DialogFragment newFragment = new CustomDatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "DatePicker");
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            String dateString = bundle.getString(START_DATE);
+            mButtonStartDate.setText(dateString);
+        }
     }
 
     public void selectEndDateOnClick(View view) {
@@ -158,7 +190,10 @@ public class ManageTrip extends AppCompatActivity {
         Map<String, Object> destination = new HashMap<>();
         destination.put("season", mEditTextTripName.getText().toString());
         destination.put("location", mEditTextDestination.getText().toString());
-        destination.put("imageLocation", "https://static.toiimg.com/photo/msid-58515713,width-96,height-65.cms");
+        destination.put("price", mSeekBarPrice.getProgress());
+        destination.put("rating", mRatingBarEvaluation.getRating());
+//        destination.put("imageLocation", "https://static.toiimg.com/photo/msid-58515713,width-96,height-65.cms");
+        destination.put("imageLocation", mImageLocation);
 
         db.collection("destinations")
                 .add(destination)
@@ -174,6 +209,5 @@ public class ManageTrip extends AppCompatActivity {
                         Toast.makeText(ManageTrip.this, "Error adding document", Toast.LENGTH_LONG).show();
                     }
                 });
-
     }
 }

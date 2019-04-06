@@ -1,5 +1,7 @@
 package com.example.traveljournalproject;
 
+import java.util.Date;
+
 public class Destination {
     private String mSeason;
     private String mDestination;
@@ -7,14 +9,20 @@ public class Destination {
     private String mTripType;
     private float mRating;
     private int mPrice;
+    private Date mStartDate;
+    private Date mEndDate;
+    private String mDatabaseDocumentID;
 
-    public Destination(String season, String destination, String imageLocation, String tripType, float rating, int price) {
+    public Destination(String season, String destination, String imageLocation, String tripType, float rating, int price, Date startDate, Date endDate, String databaseDocumentID) {
         mSeason = season;
         mDestination = destination;
         mImageLocation = imageLocation;
         mTripType = tripType;
         mRating = rating;
         mPrice = price;
+        mStartDate = startDate;
+        mEndDate = endDate;
+        mDatabaseDocumentID = databaseDocumentID;
     }
 
     public String getSeason() {
@@ -63,5 +71,29 @@ public class Destination {
 
     public void setPrice(int price) {
         mPrice = price;
+    }
+
+    public Date getStartDate() {
+        return mStartDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        mStartDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return mEndDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        mEndDate = endDate;
+    }
+
+    public String getDatabaseDocumentID() {
+        return mDatabaseDocumentID;
+    }
+
+    public void setDatabaseDocumentID(String databaseDocumentID) {
+        mDatabaseDocumentID = databaseDocumentID;
     }
 }
