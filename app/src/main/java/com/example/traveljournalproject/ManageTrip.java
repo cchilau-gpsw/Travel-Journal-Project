@@ -1,6 +1,7 @@
 package com.example.traveljournalproject;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -13,9 +14,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -44,6 +47,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     public static final String END_DATE = "end date";
     private EditText mEditTextTripName;
     private EditText mEditTextDestination;
+    private RadioGroup mRadioGroupTripType;
     private RadioButton mRadioButtonCityBreak;
     private RadioButton mRadioButtonSeaSide;
     private RadioButton mRadioButtonMountains;
@@ -53,7 +57,6 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     private Button mButtonEndDate;
     private String mDatabaseDocumentID;
     private static String mImageLocation;
-
     private Date mStartDate;
     private Date mEndDate;
 
@@ -114,6 +117,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
         mSeekBarPrice = findViewById(R.id.seek_bar_price);
         mButtonStartDate = findViewById(R.id.button_start_date);
         mButtonEndDate = findViewById(R.id.button_end_date);
+        mRadioGroupTripType = findViewById(R.id.radio_group_trip_type);
     }
 
     public void selectPhotoFromGallery(View view) {
@@ -135,22 +139,25 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            final StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
+        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri selectedImageUri = data.getData();
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
+            final StorageReference fileReference = storageReference.child(System.currentTimeMillis()
+                    + "." + getFileExtension(selectedImageUri));
             if (requestCode == GALLERY_REQUEST_CODE) {
-                Uri selectedImageUri = data.getData();
-
-                storageReference.putFile(selectedImageUri)
+                fileReference.putFile(selectedImageUri)
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                String downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
-                                Log.d("URL::::::::: ", downloadUrl);
-                                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
                                         Log.d("**************", "onSuccess: uri= " + uri.toString());
                                         mImageLocation = uri.toString();
+                                        if (mDatabaseDocumentID != null && !mDatabaseDocumentID.isEmpty()) {
+                                            FirebaseFirestore.getInstance().collection("destinations").document(mDatabaseDocumentID)
+                                                    .update("imageLocation", uri.toString());
+                                        }
                                     }
                                 });
                             }
@@ -163,6 +170,12 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                         });
             }
         }
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
     }
 
     public void selectStartDateOnClick(View view) {
@@ -190,22 +203,64 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
         destination.put("rating", mRatingBarEvaluation.getRating());
         destination.put("startDate", mStartDate);
         destination.put("endDate", mEndDate);
-        destination.put("imageLocation", mImageLocation);
+        if (mImageLocation != null && !mImageLocation.isEmpty()) {
+            destination.put("imageLocation", mImageLocation);
+        }
+        destination.put("tripType", getTripType());
+        if (mDatabaseDocumentID == null || mDatabaseDocumentID.isEmpty()) {
+            db.collection("destinations")
+                    .add(destination)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Toast.makeText(ManageTrip.this, "DocumentSnapshot added with ID: " + documentReference.getId(), Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(ManageTrip.this, "Error adding document", Toast.LENGTH_LONG).show();
+                        }
+                    });
+        } else {
+            DocumentReference docRef = db.collection("destinations").document(mDatabaseDocumentID);
+            docRef.update("season", mEditTextTripName.getText().toString());
+//                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void aVoid) {
+//                            Toast.makeText(ManageTrip.this, "Document updated!", Toast.LENGTH_LONG).show();
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Toast.makeText(ManageTrip.this, "Error editing document", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
+            docRef.update("location", mEditTextDestination.getText().toString());
+            docRef.update("tripType", getTripType());
+            docRef.update("price", mSeekBarPrice.getProgress());
+            docRef.update("rating", mRatingBarEvaluation.getRating());
+            if (mStartDate != null) {
+                docRef.update("startDate", mStartDate);
+            }
+            if (mEndDate != null) {
+                docRef.update("endDate", mEndDate);
+            }
+            if (mImageLocation != null && !mImageLocation.isEmpty()) {
+                docRef.update("imageLocation", mImageLocation);
+            }
 
-        db.collection("destinations")
-                .add(destination)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(ManageTrip.this, "DocumentSnapshot added with ID: " + documentReference.getId(), Toast.LENGTH_LONG).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ManageTrip.this, "Error adding document", Toast.LENGTH_LONG).show();
-                    }
-                });
+        }
+        mImageLocation = null;
+        startActivity(new Intent(ManageTrip.this, MyTrips.class));
+    }
+
+    private String getTripType() {
+        if (mRadioButtonSeaSide.isChecked()) return mRadioButtonSeaSide.getText().toString();
+        if (mRadioButtonMountains.isChecked()) return mRadioButtonMountains.getText().toString();
+        if (mRadioButtonCityBreak.isChecked()) return mRadioButtonCityBreak.getText().toString();
+        return "None selected";
     }
 
     @Override

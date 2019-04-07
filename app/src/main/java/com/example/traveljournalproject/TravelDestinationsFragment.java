@@ -89,8 +89,12 @@ public class TravelDestinationsFragment extends Fragment {
                                         intent.putExtra(RATING, destinations.get(position).getRating());
                                         intent.putExtra(PRICE, destinations.get(position).getPrice());
                                         Format formatter = new SimpleDateFormat("dd/MM/yyyy");
-                                        intent.putExtra(START_DATE, formatter.format(destinations.get(position).getStartDate()));
-                                        intent.putExtra(END_DATE, formatter.format(destinations.get(position).getEndDate()));
+                                        if (destinations.get(position).getStartDate() != null) {
+                                            intent.putExtra(START_DATE, formatter.format(destinations.get(position).getStartDate()));
+                                        }
+                                        if (destinations.get(position).getEndDate() != null) {
+                                            intent.putExtra(END_DATE, formatter.format(destinations.get(position).getEndDate()));
+                                        }
                                         intent.putExtra(DATABASE_DOCUMENT_ID, destinations.get(position).getDatabaseDocumentID());
                                         startActivity(intent);
                                     }
