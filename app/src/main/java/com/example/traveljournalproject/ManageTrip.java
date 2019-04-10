@@ -2,16 +2,23 @@ package com.example.traveljournalproject;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -31,6 +38,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,6 +48,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 public class ManageTrip extends AppCompatActivity implements DateChangedListener {
 
@@ -55,10 +66,13 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     private SeekBar mSeekBarPrice;
     private Button mButtonStartDate;
     private Button mButtonEndDate;
+    private Button mButtonSaveTrip;
     private String mDatabaseDocumentID;
-    private static String mImageLocation;
+    private String mImageLocation;
     private Date mStartDate;
     private Date mEndDate;
+    String mCurrentPhotoPath;
+    Uri photoURI;
 
 
     @Override
@@ -94,7 +108,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                 int price = bundle.getInt(TravelDestinationsFragment.PRICE);
                 mSeekBarPrice.setProgress(price);
                 String startDate = bundle.getString(TravelDestinationsFragment.START_DATE);
-                if (startDate != null && !startDate.isEmpty()){
+                if (startDate != null && !startDate.isEmpty()) {
                     mButtonStartDate.setText(startDate);
                 }
                 String endDate = bundle.getString(TravelDestinationsFragment.END_DATE);
@@ -118,6 +132,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
         mButtonStartDate = findViewById(R.id.button_start_date);
         mButtonEndDate = findViewById(R.id.button_end_date);
         mRadioGroupTripType = findViewById(R.id.radio_group_trip_type);
+        mButtonSaveTrip = findViewById(R.id.button_save);
     }
 
     public void selectPhotoFromGallery(View view) {
@@ -128,48 +143,104 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     }
 
     public void takePicture(View view) {
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         if (ContextCompat.checkSelfPermission(ManageTrip.this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(ManageTrip.this, new String[] {Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
+            ActivityCompat.requestPermissions(ManageTrip.this, new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
         }
-        startActivityForResult(intent, CAMERA_REQUEST_CODE);
+
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri selectedImageUri = data.getData();
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
-            final StorageReference fileReference = storageReference.child(System.currentTimeMillis()
-                    + "." + getFileExtension(selectedImageUri));
-            if (requestCode == GALLERY_REQUEST_CODE) {
-                fileReference.putFile(selectedImageUri)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {
-                                        Log.d("**************", "onSuccess: uri= " + uri.toString());
-                                        mImageLocation = uri.toString();
-                                        if (mDatabaseDocumentID != null && !mDatabaseDocumentID.isEmpty()) {
-                                            FirebaseFirestore.getInstance().collection("destinations").document(mDatabaseDocumentID)
-                                                    .update("imageLocation", uri.toString());
-                                        }
-                                    }
-                                });
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(ManageTrip.this, "Failed to upload file", Toast.LENGTH_LONG).show();
-                            }
-                        });
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CAMERA_REQUEST_CODE && data != null) {
+                getCapturedImageAndSaveToStorage(data);
+            }
+            if (requestCode == GALLERY_REQUEST_CODE && data != null && data.getData() != null) {
+                getGalleryImageAndSaveToStorage(data);
+
             }
         }
+    }
+
+    private void getGalleryImageAndSaveToStorage(Intent data) {
+        Uri selectedImageUri = data.getData();
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
+        final StorageReference fileReference = storageReference.child(System.currentTimeMillis()
+                + "." + getFileExtension(selectedImageUri));
+
+        fileReference.putFile(selectedImageUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Log.d("**************", "onSuccess: uri= " + uri.toString());
+                                mImageLocation = uri.toString();
+                                SharedPreferences prefs = getSharedPreferences("location", Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("location", uri.toString());
+                                editor.apply();
+                                if (mDatabaseDocumentID != null && !mDatabaseDocumentID.isEmpty()) {
+                                    FirebaseFirestore.getInstance().collection("destinations").document(mDatabaseDocumentID)
+                                            .update("imageLocation", uri.toString());
+                                }
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ManageTrip.this, "Failed to upload file", Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void getCapturedImageAndSaveToStorage(Intent data) {
+        Bundle bundle = data.getExtras();
+        final Bitmap bmp = (Bitmap) bundle.get("data");
+
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
+        final StorageReference fileReference = storageReference.child(System.currentTimeMillis() + ".jpg");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] transferData = baos.toByteArray();
+
+        fileReference.putBytes(transferData)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Log.d("**************", "onSuccess: uri= " + uri.toString());
+                                mImageLocation = uri.toString();
+                                SharedPreferences prefs = getSharedPreferences("location", Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("location", uri.toString());
+                                editor.apply();
+                                if (mDatabaseDocumentID != null && !mDatabaseDocumentID.isEmpty()) {
+                                    FirebaseFirestore.getInstance().collection("destinations").document(mDatabaseDocumentID)
+                                            .update("imageLocation", uri.toString());
+                                }
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ManageTrip.this, "Failed to upload file", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private String getFileExtension(Uri uri) {
@@ -203,6 +274,8 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
         destination.put("rating", mRatingBarEvaluation.getRating());
         destination.put("startDate", mStartDate);
         destination.put("endDate", mEndDate);
+        SharedPreferences prefs = getSharedPreferences("location", Context.MODE_PRIVATE);
+        mImageLocation = prefs.getString("location", "");
         if (mImageLocation != null && !mImageLocation.isEmpty()) {
             destination.put("imageLocation", mImageLocation);
         }
@@ -225,18 +298,6 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
         } else {
             DocumentReference docRef = db.collection("destinations").document(mDatabaseDocumentID);
             docRef.update("season", mEditTextTripName.getText().toString());
-//                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                        @Override
-//                        public void onSuccess(Void aVoid) {
-//                            Toast.makeText(ManageTrip.this, "Document updated!", Toast.LENGTH_LONG).show();
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Toast.makeText(ManageTrip.this, "Error editing document", Toast.LENGTH_LONG).show();
-//                        }
-//                    });
             docRef.update("location", mEditTextDestination.getText().toString());
             docRef.update("tripType", getTripType());
             docRef.update("price", mSeekBarPrice.getProgress());
@@ -247,12 +308,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
             if (mEndDate != null) {
                 docRef.update("endDate", mEndDate);
             }
-            if (mImageLocation != null && !mImageLocation.isEmpty()) {
-                docRef.update("imageLocation", mImageLocation);
-            }
-
         }
-        mImageLocation = null;
         startActivity(new Intent(ManageTrip.this, MyTrips.class));
     }
 
