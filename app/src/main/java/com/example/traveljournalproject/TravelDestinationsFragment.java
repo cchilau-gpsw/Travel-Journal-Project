@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -35,7 +36,7 @@ public class TravelDestinationsFragment extends Fragment {
     public static final String START_DATE = "start date";
     public static final String END_DATE = "end date";
     public static final String DATABASE_DOCUMENT_ID = "document id";
-    private static final String DESTINATIONS_COLLECTION = "destinations";
+    public static final String DESTINATIONS_COLLECTION = "destinations";
 
     public RecyclerView getRecyclerViewDestinations() {
         return mRecyclerViewDestinations;
@@ -61,7 +62,8 @@ public class TravelDestinationsFragment extends Fragment {
 
 
         final List<Destination> destinations = new ArrayList<>();
-        FirebaseFirestore.getInstance().collection(DESTINATIONS_COLLECTION)
+        String currentUserID = FirebaseAuth.getInstance().getUid();
+        FirebaseFirestore.getInstance().collection(DESTINATIONS_COLLECTION + "_" + currentUserID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

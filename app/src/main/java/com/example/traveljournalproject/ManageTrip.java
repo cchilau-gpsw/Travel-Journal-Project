@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -54,8 +55,6 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
 
     public static final int GALLERY_REQUEST_CODE = 1;
     public static final int CAMERA_REQUEST_CODE = 2;
-    public static final String START_DATE = "start date";
-    public static final String END_DATE = "end date";
     private EditText mEditTextTripName;
     private EditText mEditTextDestination;
     private RadioGroup mRadioGroupTripType;
@@ -71,8 +70,6 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     private String mImageLocation;
     private Date mStartDate;
     private Date mEndDate;
-    String mCurrentPhotoPath;
-    Uri photoURI;
 
 
     @Override
@@ -170,7 +167,8 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
 
     private void getGalleryImageAndSaveToStorage(Intent data) {
         Uri selectedImageUri = data.getData();
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
+        final String currentUserID = FirebaseAuth.getInstance().getUid();
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID);
         final StorageReference fileReference = storageReference.child(System.currentTimeMillis()
                 + "." + getFileExtension(selectedImageUri));
 
@@ -188,7 +186,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                                 editor.putString("location", uri.toString());
                                 editor.apply();
                                 if (mDatabaseDocumentID != null && !mDatabaseDocumentID.isEmpty()) {
-                                    FirebaseFirestore.getInstance().collection("destinations").document(mDatabaseDocumentID)
+                                    FirebaseFirestore.getInstance().collection(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID).document(mDatabaseDocumentID)
                                             .update("imageLocation", uri.toString());
                                 }
                             }
@@ -206,8 +204,8 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
     private void getCapturedImageAndSaveToStorage(Intent data) {
         Bundle bundle = data.getExtras();
         final Bitmap bmp = (Bitmap) bundle.get("data");
-
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference("destinations");
+        final String currentUserID = FirebaseAuth.getInstance().getUid();
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID);
         final StorageReference fileReference = storageReference.child(System.currentTimeMillis() + ".jpg");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -228,7 +226,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                                 editor.putString("location", uri.toString());
                                 editor.apply();
                                 if (mDatabaseDocumentID != null && !mDatabaseDocumentID.isEmpty()) {
-                                    FirebaseFirestore.getInstance().collection("destinations").document(mDatabaseDocumentID)
+                                    FirebaseFirestore.getInstance().collection(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID).document(mDatabaseDocumentID)
                                             .update("imageLocation", uri.toString());
                                 }
                             }
@@ -267,6 +265,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
 
     public void saveDestinationOnClick(View view) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String currentUserID = FirebaseAuth.getInstance().getUid();
         Map<String, Object> destination = new HashMap<>();
         destination.put("season", mEditTextTripName.getText().toString());
         destination.put("location", mEditTextDestination.getText().toString());
@@ -281,7 +280,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
         }
         destination.put("tripType", getTripType());
         if (mDatabaseDocumentID == null || mDatabaseDocumentID.isEmpty()) {
-            db.collection("destinations")
+            db.collection(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID)
                     .add(destination)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
@@ -296,7 +295,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                         }
                     });
         } else {
-            DocumentReference docRef = db.collection("destinations").document(mDatabaseDocumentID);
+            DocumentReference docRef = db.collection(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID).document(mDatabaseDocumentID);
             docRef.update("season", mEditTextTripName.getText().toString());
             docRef.update("location", mEditTextDestination.getText().toString());
             docRef.update("tripType", getTripType());
