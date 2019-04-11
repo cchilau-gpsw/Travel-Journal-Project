@@ -38,6 +38,11 @@ public class DestinationAdapter extends RecyclerView.Adapter<DestinationViewHold
                 .placeholder(R.drawable.android_3)
                 .error(R.drawable.android_3)
                 .into(destinationViewHolder.getImageViewDestination());
+        if (currentDestination.isFavorite()) {
+            destinationViewHolder.getCheckBoxFavorite().setChecked(true);
+        } else {
+            destinationViewHolder.getCheckBoxFavorite().setChecked(false);
+        }
     }
 
     @Override

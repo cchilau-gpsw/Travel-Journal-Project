@@ -38,10 +38,6 @@ public class TravelDestinationsFragment extends Fragment {
     public static final String DATABASE_DOCUMENT_ID = "document id";
     public static final String DESTINATIONS_COLLECTION = "destinations";
 
-    public RecyclerView getRecyclerViewDestinations() {
-        return mRecyclerViewDestinations;
-    }
-
     private RecyclerView mRecyclerViewDestinations;
 
     public TravelDestinationsFragment() { }
@@ -72,7 +68,7 @@ public class TravelDestinationsFragment extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 destinations.add(new Destination(document.getString("season"), document.getString("location"), document.getString("imageLocation"),
                                         document.getString("tripType"), (float)(document.getLong("rating")), document.getLong("price").intValue(),
-                                        document.getDate("startDate"), document.getDate("endDate"), document.getId()));
+                                        document.getDate("startDate"), document.getDate("endDate"), document.getBoolean("isFavorite"), document.getId()));
 
                                 final DestinationAdapter destinationAdapter = new DestinationAdapter(destinations, getActivity());
                                 mRecyclerViewDestinations.setAdapter(destinationAdapter);
@@ -108,32 +104,4 @@ public class TravelDestinationsFragment extends Fragment {
                     }
                 });
     }
-
-
-    public void addNewDestinationOnClick(View view) {
-        Intent intent = new Intent(getActivity(), ManageTrip.class);
-        startActivity(intent);
-    }
-
-//    public void addDestination(String season, String location, String imageLocation) {
-//        List<Destination> currentDestinationList = getDestinations();
-//        currentDestinationList.add(new Destination(season, location, imageLocation));
-//    }
-
-
-    public void onClick(View view) {
-
-        mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Intent intent = new Intent(getActivity(), ManageTrip.class);
-//                intent.putExtra(TRIP_NAME, getDestinations().get(position).getSeason());
-//                intent.putExtra(DESTINATION, getDestinations().get(position).getDestination());
-                startActivity(intent);
-            }
-        }));
-    }
-
-
-
 }

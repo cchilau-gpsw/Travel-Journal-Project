@@ -11,9 +11,11 @@ public class Destination {
     private int mPrice;
     private Date mStartDate;
     private Date mEndDate;
+    private boolean mIsFavorite;
     private String mDatabaseDocumentID;
 
-    public Destination(String season, String destination, String imageLocation, String tripType, float rating, int price, Date startDate, Date endDate, String databaseDocumentID) {
+
+    public Destination(String season, String destination, String imageLocation, String tripType, float rating, int price, Date startDate, Date endDate, boolean isFavorite, String databaseDocumentID) {
         mSeason = season;
         mDestination = destination;
         mImageLocation = imageLocation;
@@ -22,6 +24,7 @@ public class Destination {
         mPrice = price;
         mStartDate = startDate;
         mEndDate = endDate;
+        mIsFavorite = isFavorite;
         mDatabaseDocumentID = databaseDocumentID;
     }
 
@@ -95,5 +98,13 @@ public class Destination {
 
     public void setDatabaseDocumentID(String databaseDocumentID) {
         mDatabaseDocumentID = databaseDocumentID;
+    }
+
+    public boolean isFavorite() {
+        return mIsFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        mIsFavorite = favorite;
     }
 }

@@ -53,8 +53,8 @@ public class MyTrips extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Intent intent = new Intent(MyTrips.this, ManageTrip.class);
-               startActivity(intent);
+                Intent intent = new Intent(MyTrips.this, ManageTrip.class);
+                startActivity(intent);
             }
         });
 
@@ -157,15 +157,6 @@ public class MyTrips extends AppCompatActivity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             return;
-        } else {
-//            String username = mFirebaseUser.getDisplayName().toString();
-//            if (username != null && !username.isEmpty()) {
-//                TextView cucu = findViewById(R.id.text_view_header_username);
-//                cucu.setText("cucu");
-//            }
-//            String userEmail = mFirebaseUser.getEmail().toString();
-//            if (userEmail != null && !userEmail.isEmpty()) {
-////                mTextViewUserEmail.setText(userEmail);
-            }
         }
     }
+}
