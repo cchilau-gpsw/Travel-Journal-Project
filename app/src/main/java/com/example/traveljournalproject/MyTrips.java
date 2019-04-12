@@ -73,7 +73,7 @@ public class MyTrips extends AppCompatActivity
         });
     }
 
-    private void populateLocalDatabase() {
+    private void populateLocalDatabaseAndDisplayFavorites() {
         String currentUserID = FirebaseAuth.getInstance().getUid();
         FirebaseFirestore.getInstance().collection(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID)
                 .get()
@@ -159,7 +159,7 @@ public class MyTrips extends AppCompatActivity
         if (id == R.id.nav_home) {
             addFragment(new TravelDestinationsFragment());
         } else if (id == R.id.nav_favourite) {
-            populateLocalDatabase();
+            populateLocalDatabaseAndDisplayFavorites();
 
         } else if (id == R.id.nav_about) {
 
