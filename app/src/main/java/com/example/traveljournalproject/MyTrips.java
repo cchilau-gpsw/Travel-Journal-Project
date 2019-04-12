@@ -1,12 +1,14 @@
 package com.example.traveljournalproject;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -42,10 +44,15 @@ public class MyTrips extends AppCompatActivity
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
+    private List<Destination> mFavoriteDestinations;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_trips);
+
+        DatabaseInitializer.populateAsync(FavoriteDestinationsRoomDatabase.getDatabase(this));
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -69,7 +76,46 @@ public class MyTrips extends AppCompatActivity
 
         initFirebase();
 
+        populateLocal();
+
+
         addFragment(new TravelDestinationsFragment());
+    }
+
+    private void populateLocal() {
+        String currentUserID = FirebaseAuth.getInstance().getUid();
+        FirebaseFirestore.getInstance().collection(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull final Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+
+                            AsyncTask.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    FavoriteDestinationsRoomDatabase.getDatabase(MyTrips.this).itemDao().deleteAll();
+                                    for (final QueryDocumentSnapshot document : task.getResult()) {
+                                        if (document.getBoolean("isFavorite") == true) {
+
+                                            FavoriteDestinationsRoomDatabase.getDatabase(MyTrips.this).itemDao().insertItem(new FavoriteDestination(document.getString("season"), document.getString("location"),
+                                                    document.getString("imageLocation"), document.getLong("price").intValue(),
+                                                    (float) document.getLong("rating")));
+                                            Log.e("Lista ************", DatabaseInitializer.getTripList().size() + "");
+                                            Log.e("**********", "Added item for document id" + document.getId());
+
+
+                                            DatabaseInitializer.populateAsync(FavoriteDestinationsRoomDatabase.getDatabase(MyTrips.this));
+
+
+                                        }
+                                    }
+                                }
+                            });
+
+                        }
+                    }
+                });
     }
 
     @Override
@@ -127,6 +173,7 @@ public class MyTrips extends AppCompatActivity
         if (id == R.id.nav_home) {
             addFragment(new TravelDestinationsFragment());
         } else if (id == R.id.nav_favourite) {
+            addFragment(new FavoriteDestinationsFragment());
 
         } else if (id == R.id.nav_about) {
 
