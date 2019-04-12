@@ -42,7 +42,8 @@ public class TravelDestinationsFragment extends Fragment {
 
     private RecyclerView mRecyclerViewDestinations;
 
-    public TravelDestinationsFragment() { }
+    public TravelDestinationsFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,7 +70,7 @@ public class TravelDestinationsFragment extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 destinations.add(new Destination(document.getString("season"), document.getString("location"), document.getString("imageLocation"),
-                                        document.getString("tripType"), (float)(document.getLong("rating")), document.getLong("price").intValue(),
+                                        document.getString("tripType"), (float) (document.getLong("rating")), document.getLong("price").intValue(),
                                         document.getDate("startDate"), document.getDate("endDate"), document.getBoolean("isFavorite"), document.getId()));
 
                                 final DestinationAdapter destinationAdapter = new DestinationAdapter(destinations, getActivity());

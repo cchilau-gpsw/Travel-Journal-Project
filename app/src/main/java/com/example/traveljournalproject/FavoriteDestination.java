@@ -51,39 +51,19 @@ public class FavoriteDestination {
         return mTripName;
     }
 
-    public void setTripName(String tripName) {
-        mTripName = tripName;
-    }
-
     public String getLocation() {
         return mLocation;
-    }
-
-    public void setLocation(String location) {
-        mLocation = location;
     }
 
     public String getImageLocation() {
         return mImageLocation;
     }
 
-    public void setImageLocation(String imageLocation) {
-        mImageLocation = imageLocation;
-    }
-
     public int getPrice() {
         return mPrice;
     }
 
-    public void setPrice(int price) {
-        mPrice = price;
-    }
-
     public float getRating() {
         return mRating;
-    }
-
-    public void setRating(float rating) {
-        mRating = rating;
     }
 }

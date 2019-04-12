@@ -18,10 +18,6 @@ public class DestinationViewHolder extends RecyclerView.ViewHolder {
         return mCheckBoxFavorite;
     }
 
-    public void setCheckBoxFavorite(CheckBox checkBoxFavorite) {
-        mCheckBoxFavorite = checkBoxFavorite;
-    }
-
     private CheckBox mCheckBoxFavorite;
 
 
@@ -39,31 +35,15 @@ public class DestinationViewHolder extends RecyclerView.ViewHolder {
         return mImageViewDestination;
     }
 
-    public void setImageViewDestination(ImageView imageViewDestination) {
-        mImageViewDestination = imageViewDestination;
-    }
-
     public TextView getTextViewSeason() {
         return mTextViewSeason;
-    }
-
-    public void setTextViewSeason(TextView textViewSeason) {
-        mTextViewSeason = textViewSeason;
     }
 
     public TextView getTextViewDestination() {
         return mTextViewDestination;
     }
 
-    public void setTextViewDestination(TextView textViewDestination) {
-        mTextViewDestination = textViewDestination;
-    }
-
     public TextView getTextViewPriceAndRating() {
         return mTextViewPriceAndRating;
-    }
-
-    public void setTextViewPriceAndRating(TextView textViewPriceAndRating) {
-        mTextViewPriceAndRating = textViewPriceAndRating;
     }
 }
