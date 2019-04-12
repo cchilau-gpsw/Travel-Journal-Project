@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -58,7 +60,7 @@ public class TravelDestinationsFragment extends Fragment {
 
 
         final List<Destination> destinations = new ArrayList<>();
-        String currentUserID = FirebaseAuth.getInstance().getUid();
+        final String currentUserID = FirebaseAuth.getInstance().getUid();
         FirebaseFirestore.getInstance().collection(DESTINATIONS_COLLECTION + "_" + currentUserID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -74,8 +76,22 @@ public class TravelDestinationsFragment extends Fragment {
                                 mRecyclerViewDestinations.setAdapter(destinationAdapter);
                                 mRecyclerViewDestinations.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), mRecyclerViewDestinations, new ClickListener() {
                                     @Override
-                                    public void onClick(View view, int position) {
-
+                                    public void onClick(View view, final int position) {
+                                        final CheckBox checkbox = view.findViewById(R.id.check_box_bookmark);
+                                        checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                            @Override
+                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                if (checkbox.isChecked() == true) {
+                                                    FirebaseFirestore.getInstance().collection(DESTINATIONS_COLLECTION + "_" + currentUserID)
+                                                            .document(destinations.get(position).getDatabaseDocumentID())
+                                                            .update("isFavorite", true);
+                                                } else {
+                                                    FirebaseFirestore.getInstance().collection(DESTINATIONS_COLLECTION + "_" + currentUserID)
+                                                            .document(destinations.get(position).getDatabaseDocumentID())
+                                                            .update("isFavorite", false);
+                                                }
+                                            }
+                                        });
                                     }
 
                                     @Override
