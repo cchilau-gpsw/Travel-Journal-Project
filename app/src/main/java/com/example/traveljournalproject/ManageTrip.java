@@ -269,6 +269,7 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
         destination.put("rating", mRatingBarEvaluation.getRating());
         destination.put("startDate", mStartDate);
         destination.put("endDate", mEndDate);
+        destination.put("isFavorite", false);
         SharedPreferences prefs = getSharedPreferences("location", Context.MODE_PRIVATE);
         mImageLocation = prefs.getString("location", "");
         if (mImageLocation != null && !mImageLocation.isEmpty()) {
