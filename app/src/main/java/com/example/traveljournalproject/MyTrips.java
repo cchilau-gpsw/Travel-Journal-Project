@@ -160,11 +160,10 @@ public class MyTrips extends AppCompatActivity
             addFragment(new TravelDestinationsFragment());
         } else if (id == R.id.nav_favourite) {
             populateLocalDatabaseAndDisplayFavorites();
-
         } else if (id == R.id.nav_about) {
-
+            addFragment(new AboutFragment());
         } else if (id == R.id.nav_contact) {
-
+            addFragment(new ContactFragment());
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

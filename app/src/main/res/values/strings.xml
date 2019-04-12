@@ -20,6 +20,7 @@
     <string name="gallery_photo">Gallery Photo</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about_info">Travel Journal Application\nVersion: 1.0.0\nCreated by: Mihai Nicolae</string>
     <string name="save">SAVE</string>
+    <string name="contact">Contact us:\nTelephone: +40723231086\nEmail: mihainicolae2308@gmail.com</string>
 </resources>
