@@ -21,9 +21,9 @@ public class FavoriteDestinationsFragment extends Fragment {
 
     public FavoriteDestinationsFragment() {}
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        new LoadFavoriteDestinationsAsync().execute();
         View view = inflater.inflate(R.layout.fragment_travel_destinations, container, false);
         initView(view);
         return view;
@@ -33,15 +33,24 @@ public class FavoriteDestinationsFragment extends Fragment {
 
         mFavoriteDestinations = new ArrayList<>();
 
-        for (FavoriteDestination item: DatabaseInitializer.getTripList()) {
-            mFavoriteDestinations.add(new Destination(item.getTripName(), item.getLocation(), item.getImageLocation(), null, item.getRating(),
-                    item.getPrice(), null, null, true, null));
-        }
-
         mRecyclerViewDestinations = view.findViewById(R.id.recycler_view_destinations);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerViewDestinations.setLayoutManager(layoutManager);
-        DestinationAdapter destinationAdapter = new DestinationAdapter(mFavoriteDestinations, getActivity());
+        final DestinationAdapter destinationAdapter = new DestinationAdapter(mFavoriteDestinations, getActivity());
         mRecyclerViewDestinations.setAdapter(destinationAdapter);
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                List<FavoriteDestination>  list = FavoriteDestinationsRoomDatabase.getDatabase(getActivity()).itemDao().getAllItems();
+
+                for (FavoriteDestination item: list) {
+                    mFavoriteDestinations.add(new Destination(item.getTripName(), item.getLocation(), item.getImageLocation(), null, item.getRating(),
+                            item.getPrice(), null, null, true, null));
+                }
+                destinationAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }

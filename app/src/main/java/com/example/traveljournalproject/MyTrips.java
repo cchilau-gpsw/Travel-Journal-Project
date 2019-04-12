@@ -60,11 +60,17 @@ public class MyTrips extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         initFirebase();
-
-        populateLocalDatabase();
-
-
         addFragment(new TravelDestinationsFragment());
+    }
+
+
+    private void clearLocalDatabase() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                FavoriteDestinationsRoomDatabase.getDatabase(MyTrips.this).itemDao().deleteAll();
+            }
+        });
     }
 
     private void populateLocalDatabase() {
@@ -86,9 +92,10 @@ public class MyTrips extends AppCompatActivity
                                             FavoriteDestinationsRoomDatabase.getDatabase(MyTrips.this).itemDao().insertItem(new FavoriteDestination(document.getString("season"), document.getString("location"),
                                                     document.getString("imageLocation"), document.getLong("price").intValue(),
                                                     (float) document.getLong("rating")));
-                                            DatabaseInitializer.populateAsync(FavoriteDestinationsRoomDatabase.getDatabase(MyTrips.this));
                                         }
                                     }
+                                    DatabaseInitializer.populateAsync(FavoriteDestinationsRoomDatabase.getDatabase(MyTrips.this));
+                                    addFragment(new FavoriteDestinationsFragment());
                                 }
                             });
 
@@ -132,7 +139,7 @@ public class MyTrips extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_sign_out) {
             FirebaseAuth.getInstance().signOut();
             finish();
             startActivity(new Intent(this, SignInActivity.class));
@@ -153,7 +160,6 @@ public class MyTrips extends AppCompatActivity
             addFragment(new TravelDestinationsFragment());
         } else if (id == R.id.nav_favourite) {
             populateLocalDatabase();
-            addFragment(new FavoriteDestinationsFragment());
 
         } else if (id == R.id.nav_about) {
 

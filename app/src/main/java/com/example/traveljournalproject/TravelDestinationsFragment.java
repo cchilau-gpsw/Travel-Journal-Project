@@ -92,6 +92,7 @@ public class TravelDestinationsFragment extends Fragment {
                                                 }
                                             }
                                         });
+                                        DatabaseInitializer.populateAsync(FavoriteDestinationsRoomDatabase.getDatabase(getActivity()));
                                     }
 
                                     @Override
