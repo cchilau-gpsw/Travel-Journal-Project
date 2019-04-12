@@ -33,7 +33,7 @@ public class FavoriteDestinationsFragment extends Fragment {
 
         mFavoriteDestinations = new ArrayList<>();
 
-        for(FavoriteDestination item: DatabaseInitializer.getTripList()){
+        for (FavoriteDestination item: DatabaseInitializer.getTripList()) {
             mFavoriteDestinations.add(new Destination(item.getTripName(), item.getLocation(), item.getImageLocation(), null, item.getRating(),
                     item.getPrice(), null, null, true, null));
         }
@@ -43,34 +43,5 @@ public class FavoriteDestinationsFragment extends Fragment {
         mRecyclerViewDestinations.setLayoutManager(layoutManager);
         DestinationAdapter destinationAdapter = new DestinationAdapter(mFavoriteDestinations, getActivity());
         mRecyclerViewDestinations.setAdapter(destinationAdapter);
-
-
-
-
     }
-
-//    private class LoadFavoriteDestinationsAsync extends AsyncTask<Void, Void, List<FavoriteDestination>> {
-//
-//        @Override
-//        protected List<FavoriteDestination> doInBackground(Void... voids) {
-//            FavoriteDestinationsRoomDatabase database = FavoriteDestinationsRoomDatabase.getDatabase(getActivity());
-//            return database.itemDao().getAllItems();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(List<FavoriteDestination> items) {
-//            super.onPostExecute(items);
-//            for (FavoriteDestination item : items) {
-//                mFavoriteDestinations.add(new Destination(item.getTripName(), item.getLocation(), item.getImageLocation(), null, item.getRating(),
-//                        item.getPrice(), null, null, true, null));
-//            }
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            FavoriteDestinationsRoomDatabase.getDatabase(getActivity());
-//        }
-//    }
-
 }
