@@ -64,15 +64,6 @@ public class MyTrips extends AppCompatActivity
     }
 
 
-    private void clearLocalDatabase() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                FavoriteDestinationsRoomDatabase.getDatabase(MyTrips.this).itemDao().deleteAll();
-            }
-        });
-    }
-
     private void populateLocalDatabaseAndDisplayFavorites() {
         String currentUserID = FirebaseAuth.getInstance().getUid();
         FirebaseFirestore.getInstance().collection(TravelDestinationsFragment.DESTINATIONS_COLLECTION + "_" + currentUserID)

@@ -8,9 +8,6 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "favorites")
 public class FavoriteDestination {
 
-//    public FavoriteDestination(int id) {
-//        mId = id;
-//    }
 
     public FavoriteDestination(String tripName, String location, String imageLocation, int price, float rating) {
         mTripName = tripName;

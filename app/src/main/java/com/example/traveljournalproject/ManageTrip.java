@@ -9,17 +9,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -175,7 +170,6 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                         fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                Log.d("**************", "onSuccess: uri= " + uri.toString());
                                 mImageLocation = uri.toString();
                                 SharedPreferences prefs = getSharedPreferences("location", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = prefs.edit();
@@ -215,7 +209,6 @@ public class ManageTrip extends AppCompatActivity implements DateChangedListener
                         fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                Log.d("**************", "onSuccess: uri= " + uri.toString());
                                 mImageLocation = uri.toString();
                                 SharedPreferences prefs = getSharedPreferences("location", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = prefs.edit();
