@@ -25,6 +25,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import com.microsoft.appcenter.AppCenter;
+import com.microsoft.appcenter.analytics.Analytics;
+import com.microsoft.appcenter.crashes.Crashes;
+
 public class MyTrips extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -34,6 +38,8 @@ public class MyTrips extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCenter.start(getApplication(), "d75595cb-54e5-4a1d-844d-2a3802d9e740",
+                Analytics.class, Crashes.class);
         setContentView(R.layout.activity_my_trips);
 
         DatabaseInitializer.populateAsync(FavoriteDestinationsRoomDatabase.getDatabase(this));
